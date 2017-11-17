@@ -16,12 +16,6 @@
 # Description: arpmonitor3
 ### END INIT INFO
 
-"""
-desc:
-    arpmonitor worker
-
-"""
-
 import sys
 import time
 import signal
@@ -33,9 +27,9 @@ from daemon import runner
 import lib.eq_env
 import lib.eq_cls_pcapy
 
-
 class Worker:
-
+    """ desc: arpmonitor worker """
+    
     def __init__(self, interface, vlan):
         self.interface = interface
         self.vlan = vlan
@@ -46,8 +40,6 @@ class Worker:
         self.process.start()
 
     def start(self):
-        """ to fork perfectly """
-
         try:
             listener = lib.eq_cls_pcapy.Listener(self.interface, self.vlan)
             listener.loop()
@@ -55,16 +47,12 @@ class Worker:
             listener.stop()
 
     def stop(self, signum=None, frame=None):
-        """ gracefully quit """
-
         self.process.terminate()
         sys.exit(0)
 
 
 class Daemonizer:
-
-    """ make this unix service """
-
+    """ run as unix service """
     def __init__(self):
         self.stdin_path = '/dev/null'
         self.stdout_path = '/opt/arpmonitor/log/stdout_arpmonitor3'
@@ -73,8 +61,6 @@ class Daemonizer:
         self.pidfile_timeout = 2
 
     def run(self):
-        """ what does the daemon do """
-
         worker = {}
         cnt = 0
         for (interface, vlan) in lib.eq_env.LISTENERS.iteritems():
@@ -90,11 +76,8 @@ class Daemonizer:
 
 
 if __name__ == '__main__':
-
     daemon = Daemonizer()
     daemon_runner = runner.DaemonRunner(daemon)
     daemon_runner.do_action()
 else:
-
     print "[i] I'm not a module!"
-
